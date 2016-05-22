@@ -1,12 +1,9 @@
 # ThingSpeakC
 Upload data to ThingSpeak in C (socket level HTTP req).
 
-Instructions (for Linux users):
-1- Clone this repo
-2- Type the command make (so, It'll compile the program)
-3- Have fun!
+Instructions (for Linux users): clone this repo, type the command make (so, It'll compile the program) and have fun!
 
-To execute the program, some parameters are needed on its call (key and data to be sent, in this order). For exemple:
+To execute the program, some parameters are needed on its call (key and data to be sent, in this order). For example:
 
 ./ThingSpeakC E4AKR731LNBQ67EW 1 5 10
 
