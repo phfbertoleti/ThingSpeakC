@@ -1,18 +1,15 @@
 /*
-Módulo: Header geral da comunicação com ThingSpeak (via Socket TCP) para Linux
-Autor:  Pedro Bertoleti
-Data:   05/2016
+Module: Header - Communication with ThingSpeak (on Linux) via TCP Socket
+Author:  Pedro Bertoleti
+Date:   05/2016
 */
 
 //defines
-#define ERRO_THINGSPEAK_OFFLINE  0
-#define ERRO_CONEXAO_THINGSPEAK  1
-#define ERRO_AO_ABRIR_SOCKET     2
-#define ERRO_PARAMETROS          3
-#define ENVIO_COM_SUCESSO        4
+#define THINGSPEAK_OFFLINE_ERROR     0
+#define THINGSPEAK_CONNECTION_ERROR  1
+#define OPEN_SOCKET_ERROR            2
+#define PARAMS_ERROR                 3
+#define SEND_OK                      4
 
-
-//variáveis globais
-char EnviaRequisicaoThingSpeak(int NumCampos, int * ArrayCampos, char * Chave, int TamChaves);
-
-//prototypes globais
+//global prototypes
+char SendDataToThingSpeak(int FieldNo, int * FieldArray, char * Key, int SizeOfKey);

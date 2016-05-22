@@ -1,7 +1,7 @@
 /*
-Módulo: Comunicação com ThingSpeak (via Socket TCP) para Linux
-Autor:  Pedro Bertoleti
-Data:   05/2016
+Module: Communication with ThingSpeak (on Linux) via TCP Socket
+Author:  Pedro Bertoleti
+Date:   05/2016
 */
 
 //Includes
@@ -17,68 +17,65 @@ Data:   05/2016
 
 //defines
 #define URL_THINGSPEAK             "api.thingspeak.com"
-#define PORTA_THINGSPEAK           80
-#define INICIO_REQUISICAO_HTTP     "GET /update?key="
-#define TERMINADOR_REQUISICAO_HTTP "\r\n\r\n"
-#define MAX_CARACTERES             9999
+#define PORT_THINGSPEAK            80
+#define BEGIN_OF_HTTP_REQ          "GET /update?key="
+#define END_OF_HTTP_REQ            "\r\n\r\n"
+#define MAX_SIZE                   9999
 
-//variáveis locais
+//local variables
 
-//prototypes
+//local prototypes
 
-//implementações / funções
+//implementation
 
-
-char EnviaRequisicaoThingSpeak(int NumCampos, int * ArrayCampos, char * Chave, int TamChave)
+//Function: Send some data to a ThingSpeak's channel
+//Parameters:  - Number of fields (data to be sent)
+//             - Array of integer values (all data that must be sent)
+//             - ThingSpeaks's channel Key
+//             - Size of ThingSpeak's channel key
+//Return:      - 
+char SendDataToThingSpeak(int FieldNo, int * FieldArray, char * Key, int SizeOfKey)
 {
 	int sockfd, portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *ServerTCP;
-	int TamanhoStringRequisicao;
+	int ReqStringSize;
 	int i;
-	char LinhaRequisicao[MAX_CARACTERES];
-	char InicioRequisicaoHTTP[]=INICIO_REQUISICAO_HTTP;
-	char TerminadorRequisicaoHTTP[]=TERMINADOR_REQUISICAO_HTTP;
-	char *ptLinha;
+	char ReqString[MAX_SIZE];
+	char BeginOfHTTPReq[]=BEGIN_OF_HTTP_REQ;
+	char EndOfHTTPReq[]=END_OF_HTTP_REQ;
+	char *ptReqString;
 	
-	if (NumCampos <=0)
-		return ERRO_PARAMETROS;
+	if (FieldNo <=0)
+		return PARAMS_ERROR;
 	
-	/*
-	     Montagem da string de requisição HTTP
-	*/
+	//Setting up HTTP Req. string:
+	bzero(&ReqString,sizeof(ReqString));
+	sprintf(ReqString,"%s%s",BeginOfHTTPReq,Key);
 	
-	bzero(&LinhaRequisicao,sizeof(LinhaRequisicao));
-	
-	//1- inicio da montagem da string de requisição HTTP (inicio e chave)
-	sprintf(LinhaRequisicao,"%s%s",InicioRequisicaoHTTP,Chave);
-	
-	//2- inclusao dos campos
-	ptLinha = &LinhaRequisicao[0]+(int)strlen(LinhaRequisicao);
-	
-	for(i=1; i<= NumCampos; i++)
+	ptReqString = &ReqString[0]+(int)strlen(ReqString);
+	for(i=1; i<= FieldNo; i++)
 	{
-		sprintf(ptLinha,"&field%d=%d",i,ArrayCampos[i-1]);
-		ptLinha = &LinhaRequisicao[0]+(int)strlen(LinhaRequisicao);
+		sprintf(ptReqString,"&field%d=%d",i,FieldArray[i-1]);
+		ptReqString = &ReqString[0]+(int)strlen(ReqString);
 	}
 	
-	//3- Acrescenta terminador
-	sprintf(ptLinha,"%s",TerminadorRequisicaoHTTP);
+	sprintf(ptReqString,"%s",EndOfHTTPReq);
 	
-	
-	portno = PORTA_THINGSPEAK;
+	//Connecting to ThingSpeak and sending data:
+	portno = PORT_THINGSPEAK;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     
-	//tenta abrir socket
+	//Step 1: opening a socket
 	if (sockfd < 0)
-		return ERRO_AO_ABRIR_SOCKET;
+		return OPEN_SOCKET_ERROR;
 	
-	//verifica se host esta online
+	//Step 2: check if ThingSpeak is online
 	ServerTCP = gethostbyname(URL_THINGSPEAK);
 	if (ServerTCP == NULL) 
-	    return ERRO_THINGSPEAK_OFFLINE;
+	    return THINGSPEAK_OFFLINE_ERROR;
     
-	//configura estrutura de socket com dados do servidor
+	//Step 3: setting up TCP/IP socket structure
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     bcopy((char *)ServerTCP->h_addr, 
@@ -86,14 +83,17 @@ char EnviaRequisicaoThingSpeak(int NumCampos, int * ArrayCampos, char * Chave, i
          ServerTCP->h_length);
     serv_addr.sin_port = htons(portno);
     
-	//tenta conectar no servidor
+	//Step 4: connecting to ThingSpeak server (via HTTP port / port no. 80)
 	if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
-		return ERRO_CONEXAO_THINGSPEAK;
+		return THINGSPEAK_CONNECTION_ERROR;
 	
-	//envia requisição HTTP
-    write(sockfd,LinhaRequisicao,strlen(LinhaRequisicao));
+	//Step 5: sending data to ThingSpeak's channel
+    write(sockfd,ReqString,strlen(ReqString));
 		
-	//fecha conexão
+	//Step 6: close TCP connection
     close(sockfd);    
+	
+	//All done!
+	return SEND_OK;
 }
 		   
