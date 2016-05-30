@@ -26,7 +26,7 @@ Then to compile, in the clone directory, type the command __make__
 To execute the program, some parameters are needed on its call (key and data to be sent, in this order). For example:
 
 ```shell
-"$ ./ThingSpeakC E4AKR731LNBQ67EW 1 5 1"
+"$ ./ThingSpeakC E4AKR731LNBQ67EW 1 5 10"
 ```
 It will send: 
 * field1 = 1, 
