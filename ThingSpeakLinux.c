@@ -34,7 +34,7 @@ Date:   05/2016
 //             - ThingSpeaks's channel Key
 //             - Size of ThingSpeak's channel key
 //Return:      - 
-char SendDataToThingSpeak(int FieldNo, int * FieldArray, char * Key, int SizeOfKey)
+char SendDataToThingSpeak(int FieldNo, float * FieldArray, char * Key, int SizeOfKey)
 {
 	int sockfd, portno, n;
     struct sockaddr_in serv_addr;
@@ -56,12 +56,12 @@ char SendDataToThingSpeak(int FieldNo, int * FieldArray, char * Key, int SizeOfK
 	ptReqString = &ReqString[0]+(int)strlen(ReqString);
 	for(i=1; i<= FieldNo; i++)
 	{
-		sprintf(ptReqString,"&field%d=%d",i,FieldArray[i-1]);
+		sprintf(ptReqString,"&field%d=%.2f",i,FieldArray[i-1]);
 		ptReqString = &ReqString[0]+(int)strlen(ReqString);
 	}
 	
 	sprintf(ptReqString,"%s",EndOfHTTPReq);
-	
+	printf("%s",EndOfHTTPReq);
 	//Connecting to ThingSpeak and sending data:
 	portno = PORT_THINGSPEAK;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
