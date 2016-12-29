@@ -13,7 +13,7 @@
 
 int main (int argc, char *argv[])
 {
-	int FieldsArray[argc-1];
+	float FieldsArray[argc-1];
 	int i;
 		
     //arguments:
@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
 	
 	//copying data arguments
 	for(i=2;i<argc; i++)
-		FieldsArray[i-2]=atoi(argv[i]);
+		FieldsArray[i-2]=atof(argv[i]);
 	
 	//send data to channel.
 	SendDataToThingSpeak(argc-2, &FieldsArray[0],argv[1],sizeof(argv[1]));
